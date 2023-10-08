@@ -1,10 +1,11 @@
-// FlatBufferAssignment.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// FlatBufferEncoder.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 #pragma
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "PersonCreator.h"
+#include "flatbuffers/flatbuffers.h"
+#include "person_group_generated.h"
 #include <filesystem>
 
 int main(int argc, char* argv[])
@@ -17,23 +18,34 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    if (std::filesystem::exists(binFilePath)) {
+        std::filesystem::remove(binFilePath);
+    }
+
     flatbuffers::FlatBufferBuilder builder;
-    std::vector<flatbuffers::Offset<PersonGroup::Person>> persons_vector;
-    float averageWeight, averageAge;
 
-    PersonCreator creator;
-    creator.Create(builder, persons_vector, averageAge, averageWeight);
-    auto group = CreateGroup(builder, builder.CreateString("GroupOfPersons"), averageAge, averageWeight, builder.CreateVector(persons_vector));
-    builder.Finish(group);
+    //Create person
+    auto person = PersonGroup::CreatePerson(builder, builder.CreateString("Ram"), 21, 76.5, PersonGroup::Gender::Gender_Male);
 
-    // Serialize to binary
-    const uint8_t* buf = builder.GetBufferPointer();
-    const size_t size = builder.GetSize();
+    //create group
+    flatbuffers::Offset<flatbuffers::String> ram = builder.CreateString("Ram");
+    flatbuffers::Offset<flatbuffers::String> shayam = builder.CreateString("Shayam");
+    flatbuffers::Offset<flatbuffers::String> raghuveer = builder.CreateString("Raghuveer");
+    auto names_vector = builder.CreateVector({ ram, shayam, raghuveer });
+    auto group = PersonGroup::CreateGroup(builder, builder.CreateString("FightClub"), 24.5, 66, names_vector);
 
-    // Save to file
-    std::ofstream outfile(binFilePath, std::ios::binary);
-    outfile.write(reinterpret_cast<const char*>(buf), size);
-    outfile.close();
+    //auto client = PersonGroup::CreateClient(builder, 0, person);
+    auto client = PersonGroup::CreateClient(builder, 1, 0, group);
+
+    //create root
+    auto root = PersonGroup::CreateRoot(builder, client);
+
+    //finish
+    builder.Finish(root);
+
+    //write to file
+    std::ofstream outfile(binFilePath, std::ofstream::binary);
+    outfile.write(reinterpret_cast<const char*>(builder.GetBufferPointer()), builder.GetSize());
 
     return 0;
 }

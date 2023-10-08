@@ -23,47 +23,28 @@ class Program
         }
 
         byte[] buffer = File.ReadAllBytes(binFilePath);
-        ByteBuffer byteBuffer = new ByteBuffer(buffer);
+        var byteBuffer = new ByteBuffer(buffer);
+        var root = Root.GetRootAsRoot(byteBuffer);
+        var client = root.Client;
 
-        Group group = Group.GetRootAsGroup(byteBuffer);
-
-        string groupName = group.Groupname;
-        float averageAge = group.AverageAge;
-        float averageWeight = group.AverageWeight;
-
-        Console.WriteLine($"Group Name: {groupName}");
-        Console.WriteLine($"Average Age: {averageAge}");
-        Console.WriteLine($"Average Weight: {averageWeight}");
-
-        var persons = new Person[group.PersonsLength];
-        for (int i = 0; i < group.PersonsLength; i++)
+        if (client!.Value!.ClientType == 0) 
         {
-            persons[i] = group.Persons(i).Value;
-            string personName = persons[i].Name;
-            int age = persons[i].Age;
-            float weight = persons[i].Weight;
-            string gender = ConvertSByteToGender(persons[i].Gender);
+            Person? person = client.Value.Client_;
+            Console.WriteLine($"Name: {person.Value.Name}, Age: {person.Value.Age}, Weight: {person.Value.Weight}, Gender: {person.Value.Gender}");
+        } 
+        else if (client!.Value!.ClientType == 1) 
+        {
+            Group? group = client.Value.Group;
 
-            Console.WriteLine($"Person {i + 1} - Name: {personName}, Age: {age}, Weight: {weight}, Gender: {gender}");
-        }
+            Console.WriteLine($"Group Name: {group.Value.Groupname}, Average Age: {group.Value.AverageAge}, Average Weight: {group.Value.AverageWeight}");
+            Console.Write("Names: ");
+            for (int i = 0; i < group.Value.NamesLength;++i)
+            {
+                Console.Write($"{group.Value.Names(i)}, ");
+            }
+        } 
 
         Console.WriteLine("\nPress any key to exit...");
         Console.ReadKey();
-    }
-
-    static string ConvertSByteToGender(sbyte value)
-    {
-        if (value == 1)
-        {
-            return "Male";
-        }
-        else if (value == 0)
-        {
-            return "Female";
-        }
-        else
-        {
-            return "Unknown";
-        }
     }
 }

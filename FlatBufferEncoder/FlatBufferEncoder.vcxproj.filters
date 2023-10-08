@@ -23,11 +23,5 @@
     <ClInclude Include="person_group_generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PersonCreator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Persons.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

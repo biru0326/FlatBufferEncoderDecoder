@@ -1,19 +1,30 @@
 namespace PersonGroup;
 
-table Person
-{
-	name: string;
-	age: int;
-	weight: float;
-	gender: byte;
+enum Gender: byte { Male, Female }
+
+table Person {
+  name: string;
+  age: int;
+  weight: float;
+  gender: Gender;
 }
 
-table Group
-{
-	groupname: string;
-	average_age: float;
-	average_weight: float;
-	persons: [Person];
+table Group {
+  groupname: string;
+  average_age: float;
+  average_weight: float;
+  names: [string];
 }
 
-root_type Group;
+table Client {
+  client_type: byte; // 0 for Person, 1 for Group
+  client: Person;
+  group: Group;
+}
+
+
+table Root {
+  client: Client;
+}
+
+root_type Root;

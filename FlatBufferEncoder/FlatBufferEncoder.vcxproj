@@ -138,8 +138,6 @@
     <ClCompile Include="FlatBufferEncoder.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PersonCreator.h" />
-    <ClInclude Include="Persons.h" />
     <ClInclude Include="person_group_generated.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

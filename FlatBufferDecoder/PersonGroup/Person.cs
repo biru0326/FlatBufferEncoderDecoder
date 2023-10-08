@@ -28,13 +28,13 @@ public struct Person : IFlatbufferObject
   public byte[] GetNameArray() { return __p.__vector_as_array<byte>(4); }
   public int Age { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetInt(o + __p.bb_pos) : (int)0; } }
   public float Weight { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
-  public sbyte Gender { get { int o = __p.__offset(10); return o != 0 ? __p.bb.GetSbyte(o + __p.bb_pos) : (sbyte)0; } }
+  public PersonGroup.Gender Gender { get { int o = __p.__offset(10); return o != 0 ? (PersonGroup.Gender)__p.bb.GetSbyte(o + __p.bb_pos) : PersonGroup.Gender.Male; } }
 
   public static Offset<PersonGroup.Person> CreatePerson(FlatBufferBuilder builder,
       StringOffset nameOffset = default(StringOffset),
       int age = 0,
       float weight = 0.0f,
-      sbyte gender = 0) {
+      PersonGroup.Gender gender = PersonGroup.Gender.Male) {
     builder.StartTable(4);
     Person.AddWeight(builder, weight);
     Person.AddAge(builder, age);
@@ -47,7 +47,7 @@ public struct Person : IFlatbufferObject
   public static void AddName(FlatBufferBuilder builder, StringOffset nameOffset) { builder.AddOffset(0, nameOffset.Value, 0); }
   public static void AddAge(FlatBufferBuilder builder, int age) { builder.AddInt(1, age, 0); }
   public static void AddWeight(FlatBufferBuilder builder, float weight) { builder.AddFloat(2, weight, 0.0f); }
-  public static void AddGender(FlatBufferBuilder builder, sbyte gender) { builder.AddSbyte(3, gender, 0); }
+  public static void AddGender(FlatBufferBuilder builder, PersonGroup.Gender gender) { builder.AddSbyte(3, (sbyte)gender, 0); }
   public static Offset<PersonGroup.Person> EndPerson(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<PersonGroup.Person>(o);
@@ -63,7 +63,7 @@ static public class PersonVerify
       && verifier.VerifyString(tablePos, 4 /*Name*/, false)
       && verifier.VerifyField(tablePos, 6 /*Age*/, 4 /*int*/, 4, false)
       && verifier.VerifyField(tablePos, 8 /*Weight*/, 4 /*float*/, 4, false)
-      && verifier.VerifyField(tablePos, 10 /*Gender*/, 1 /*sbyte*/, 1, false)
+      && verifier.VerifyField(tablePos, 10 /*Gender*/, 1 /*PersonGroup.Gender*/, 1, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }

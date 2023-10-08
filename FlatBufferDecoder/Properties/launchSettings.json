@@ -2,7 +2,7 @@
   "profiles": {
     "FlatBufferDecoder": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\FlatBufferAssignment\\FlatBufferEncoder\\BufferFile\\Data.bin"
+      "commandLineArgs": "C:\\FlatBufferAssignment\\FlatBufferEncoder\\BinaryFile\\Data.bin"
     }
   }
 }

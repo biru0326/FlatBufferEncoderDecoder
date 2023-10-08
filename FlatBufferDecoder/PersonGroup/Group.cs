@@ -16,7 +16,6 @@ public struct Group : IFlatbufferObject
   public static void ValidateVersion() { FlatBufferConstants.FLATBUFFERS_23_5_26(); }
   public static Group GetRootAsGroup(ByteBuffer _bb) { return GetRootAsGroup(_bb, new Group()); }
   public static Group GetRootAsGroup(ByteBuffer _bb, Group obj) { return (obj.__assign(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
-  public static bool VerifyGroup(ByteBuffer _bb) {Google.FlatBuffers.Verifier verifier = new Google.FlatBuffers.Verifier(_bb); return verifier.VerifyBuffer("", false, GroupVerify.Verify); }
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public Group __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
@@ -29,16 +28,16 @@ public struct Group : IFlatbufferObject
   public byte[] GetGroupnameArray() { return __p.__vector_as_array<byte>(4); }
   public float AverageAge { get { int o = __p.__offset(6); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
   public float AverageWeight { get { int o = __p.__offset(8); return o != 0 ? __p.bb.GetFloat(o + __p.bb_pos) : (float)0.0f; } }
-  public PersonGroup.Person? Persons(int j) { int o = __p.__offset(10); return o != 0 ? (PersonGroup.Person?)(new PersonGroup.Person()).__assign(__p.__indirect(__p.__vector(o) + j * 4), __p.bb) : null; }
-  public int PersonsLength { get { int o = __p.__offset(10); return o != 0 ? __p.__vector_len(o) : 0; } }
+  public string Names(int j) { int o = __p.__offset(10); return o != 0 ? __p.__string(__p.__vector(o) + j * 4) : null; }
+  public int NamesLength { get { int o = __p.__offset(10); return o != 0 ? __p.__vector_len(o) : 0; } }
 
   public static Offset<PersonGroup.Group> CreateGroup(FlatBufferBuilder builder,
       StringOffset groupnameOffset = default(StringOffset),
       float average_age = 0.0f,
       float average_weight = 0.0f,
-      VectorOffset personsOffset = default(VectorOffset)) {
+      VectorOffset namesOffset = default(VectorOffset)) {
     builder.StartTable(4);
-    Group.AddPersons(builder, personsOffset);
+    Group.AddNames(builder, namesOffset);
     Group.AddAverageWeight(builder, average_weight);
     Group.AddAverageAge(builder, average_age);
     Group.AddGroupname(builder, groupnameOffset);
@@ -49,18 +48,16 @@ public struct Group : IFlatbufferObject
   public static void AddGroupname(FlatBufferBuilder builder, StringOffset groupnameOffset) { builder.AddOffset(0, groupnameOffset.Value, 0); }
   public static void AddAverageAge(FlatBufferBuilder builder, float averageAge) { builder.AddFloat(1, averageAge, 0.0f); }
   public static void AddAverageWeight(FlatBufferBuilder builder, float averageWeight) { builder.AddFloat(2, averageWeight, 0.0f); }
-  public static void AddPersons(FlatBufferBuilder builder, VectorOffset personsOffset) { builder.AddOffset(3, personsOffset.Value, 0); }
-  public static VectorOffset CreatePersonsVector(FlatBufferBuilder builder, Offset<PersonGroup.Person>[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
-  public static VectorOffset CreatePersonsVectorBlock(FlatBufferBuilder builder, Offset<PersonGroup.Person>[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
-  public static VectorOffset CreatePersonsVectorBlock(FlatBufferBuilder builder, ArraySegment<Offset<PersonGroup.Person>> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
-  public static VectorOffset CreatePersonsVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<Offset<PersonGroup.Person>>(dataPtr, sizeInBytes); return builder.EndVector(); }
-  public static void StartPersonsVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
+  public static void AddNames(FlatBufferBuilder builder, VectorOffset namesOffset) { builder.AddOffset(3, namesOffset.Value, 0); }
+  public static VectorOffset CreateNamesVector(FlatBufferBuilder builder, StringOffset[] data) { builder.StartVector(4, data.Length, 4); for (int i = data.Length - 1; i >= 0; i--) builder.AddOffset(data[i].Value); return builder.EndVector(); }
+  public static VectorOffset CreateNamesVectorBlock(FlatBufferBuilder builder, StringOffset[] data) { builder.StartVector(4, data.Length, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateNamesVectorBlock(FlatBufferBuilder builder, ArraySegment<StringOffset> data) { builder.StartVector(4, data.Count, 4); builder.Add(data); return builder.EndVector(); }
+  public static VectorOffset CreateNamesVectorBlock(FlatBufferBuilder builder, IntPtr dataPtr, int sizeInBytes) { builder.StartVector(1, sizeInBytes, 1); builder.Add<StringOffset>(dataPtr, sizeInBytes); return builder.EndVector(); }
+  public static void StartNamesVector(FlatBufferBuilder builder, int numElems) { builder.StartVector(4, numElems, 4); }
   public static Offset<PersonGroup.Group> EndGroup(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<PersonGroup.Group>(o);
   }
-  public static void FinishGroupBuffer(FlatBufferBuilder builder, Offset<PersonGroup.Group> offset) { builder.Finish(offset.Value); }
-  public static void FinishSizePrefixedGroupBuffer(FlatBufferBuilder builder, Offset<PersonGroup.Group> offset) { builder.FinishSizePrefixed(offset.Value); }
 }
 
 
@@ -72,7 +69,7 @@ static public class GroupVerify
       && verifier.VerifyString(tablePos, 4 /*Groupname*/, false)
       && verifier.VerifyField(tablePos, 6 /*AverageAge*/, 4 /*float*/, 4, false)
       && verifier.VerifyField(tablePos, 8 /*AverageWeight*/, 4 /*float*/, 4, false)
-      && verifier.VerifyVectorOfTables(tablePos, 10 /*Persons*/, PersonGroup.PersonVerify.Verify, false)
+      && verifier.VerifyVectorOfStrings(tablePos, 10 /*Names*/, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }
