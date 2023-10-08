@@ -1,0 +1,19 @@
+namespace PersonGroup;
+
+table Person
+{
+	name: string;
+	age: int;
+	weight: float;
+	gender: byte;
+}
+
+table Group
+{
+	groupname: string;
+	average_age: float;
+	average_weight: float;
+	persons: [Person];
+}
+
+root_type Group;

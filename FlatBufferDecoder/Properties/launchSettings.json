@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FlatBufferDecoder": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\FlatBufferAssignment\\FlatBufferEncoder\\BufferFile\\Data.bin"
+    }
+  }
+}
