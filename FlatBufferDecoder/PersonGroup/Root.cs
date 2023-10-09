@@ -20,17 +20,23 @@ public struct Root : IFlatbufferObject
   public void __init(int _i, ByteBuffer _bb) { __p = new Table(_i, _bb); }
   public Root __assign(int _i, ByteBuffer _bb) { __init(_i, _bb); return this; }
 
-  public PersonGroup.Client? Client { get { int o = __p.__offset(4); return o != 0 ? (PersonGroup.Client?)(new PersonGroup.Client()).__assign(__p.__indirect(o + __p.bb_pos), __p.bb) : null; } }
+  public PersonGroup.Client ClientType { get { int o = __p.__offset(4); return o != 0 ? (PersonGroup.Client)__p.bb.Get(o + __p.bb_pos) : PersonGroup.Client.NONE; } }
+  public TTable? Client<TTable>() where TTable : struct, IFlatbufferObject { int o = __p.__offset(6); return o != 0 ? (TTable?)__p.__union<TTable>(o + __p.bb_pos) : null; }
+  public PersonGroup.Person ClientAsPerson() { return Client<PersonGroup.Person>().Value; }
+  public PersonGroup.Group ClientAsGroup() { return Client<PersonGroup.Group>().Value; }
 
   public static Offset<PersonGroup.Root> CreateRoot(FlatBufferBuilder builder,
-      Offset<PersonGroup.Client> clientOffset = default(Offset<PersonGroup.Client>)) {
-    builder.StartTable(1);
+      PersonGroup.Client client_type = PersonGroup.Client.NONE,
+      int clientOffset = 0) {
+    builder.StartTable(2);
     Root.AddClient(builder, clientOffset);
+    Root.AddClientType(builder, client_type);
     return Root.EndRoot(builder);
   }
 
-  public static void StartRoot(FlatBufferBuilder builder) { builder.StartTable(1); }
-  public static void AddClient(FlatBufferBuilder builder, Offset<PersonGroup.Client> clientOffset) { builder.AddOffset(0, clientOffset.Value, 0); }
+  public static void StartRoot(FlatBufferBuilder builder) { builder.StartTable(2); }
+  public static void AddClientType(FlatBufferBuilder builder, PersonGroup.Client clientType) { builder.AddByte(0, (byte)clientType, 0); }
+  public static void AddClient(FlatBufferBuilder builder, int clientOffset) { builder.AddOffset(1, clientOffset, 0); }
   public static Offset<PersonGroup.Root> EndRoot(FlatBufferBuilder builder) {
     int o = builder.EndTable();
     return new Offset<PersonGroup.Root>(o);
@@ -45,7 +51,7 @@ static public class RootVerify
   static public bool Verify(Google.FlatBuffers.Verifier verifier, uint tablePos)
   {
     return verifier.VerifyTableStart(tablePos)
-      && verifier.VerifyTable(tablePos, 4 /*Client*/, PersonGroup.ClientVerify.Verify, false)
+      && verifier.VerifyField(tablePos, 4 /*ClientType*/, 1 /*PersonGroup.Client*/, 1, false)
       && verifier.VerifyTableEnd(tablePos);
   }
 }

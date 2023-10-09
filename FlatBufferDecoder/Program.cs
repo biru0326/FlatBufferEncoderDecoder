@@ -25,22 +25,21 @@ class Program
         byte[] buffer = File.ReadAllBytes(binFilePath);
         var byteBuffer = new ByteBuffer(buffer);
         var root = Root.GetRootAsRoot(byteBuffer);
-        var client = root.Client;
 
-        if (client!.Value!.ClientType == 0) 
+        if (root.ClientType == Client.Person) 
         {
-            Person? person = client.Value.Client_;
-            Console.WriteLine($"Name: {person.Value.Name}, Age: {person.Value.Age}, Weight: {person.Value.Weight}, Gender: {person.Value.Gender}");
+            Person person = root.ClientAsPerson();
+            Console.WriteLine($"Name: {person.Name}, Age: {person.Age}, Weight: {person.Weight}, Gender: {person.Gender}");
         } 
-        else if (client!.Value!.ClientType == 1) 
-        {
-            Group? group = client.Value.Group;
+        else if (root.ClientType == Client.Group)
+         {
+            Group group = root.ClientAsGroup();
 
-            Console.WriteLine($"Group Name: {group.Value.Groupname}, Average Age: {group.Value.AverageAge}, Average Weight: {group.Value.AverageWeight}");
+            Console.WriteLine($"Group Name: {group.Groupname}, Average Age: {group.AverageAge}, Average Weight: {group.AverageWeight}");
             Console.Write("Names: ");
-            for (int i = 0; i < group.Value.NamesLength;++i)
+            for (int i = 0; i < group.NamesLength; ++i)
             {
-                Console.Write($"{group.Value.Names(i)}, ");
+                Console.Write($"{group.Names(i)}, ");
             }
         } 
 

@@ -34,11 +34,8 @@ int main(int argc, char* argv[])
     auto names_vector = builder.CreateVector({ ram, shayam, raghuveer });
     auto group = PersonGroup::CreateGroup(builder, builder.CreateString("FightClub"), 24.5, 66, names_vector);
 
-    //auto client = PersonGroup::CreateClient(builder, 0, person);
-    auto client = PersonGroup::CreateClient(builder, 1, 0, group);
-
     //create root
-    auto root = PersonGroup::CreateRoot(builder, client);
+    auto root = PersonGroup::CreateRoot(builder, PersonGroup::Client_Group, group.Union());
 
     //finish
     builder.Finish(root);

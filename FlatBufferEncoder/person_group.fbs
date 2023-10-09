@@ -2,28 +2,31 @@ namespace PersonGroup;
 
 enum Gender: byte { Male, Female }
 
-table Person {
+table Person 
+{
   name: string;
   age: int;
   weight: float;
   gender: Gender;
 }
 
-table Group {
+table Group 
+{
   groupname: string;
   average_age: float;
   average_weight: float;
   names: [string];
 }
 
-table Client {
-  client_type: byte; // 0 for Person, 1 for Group
-  client: Person;
-  group: Group;
+union Client 
+{
+  Person,
+  Group
 }
 
 
-table Root {
+table Root 
+{
   client: Client;
 }
 

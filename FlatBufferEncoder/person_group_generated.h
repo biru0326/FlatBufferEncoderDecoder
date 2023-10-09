@@ -21,9 +21,6 @@ struct PersonBuilder;
 struct Group;
 struct GroupBuilder;
 
-struct Client;
-struct ClientBuilder;
-
 struct Root;
 struct RootBuilder;
 
@@ -56,6 +53,54 @@ inline const char *EnumNameGender(Gender e) {
   const size_t index = static_cast<size_t>(e);
   return EnumNamesGender()[index];
 }
+
+enum Client : uint8_t {
+  Client_NONE = 0,
+  Client_Person = 1,
+  Client_Group = 2,
+  Client_MIN = Client_NONE,
+  Client_MAX = Client_Group
+};
+
+inline const Client (&EnumValuesClient())[3] {
+  static const Client values[] = {
+    Client_NONE,
+    Client_Person,
+    Client_Group
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesClient() {
+  static const char * const names[4] = {
+    "NONE",
+    "Person",
+    "Group",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameClient(Client e) {
+  if (::flatbuffers::IsOutRange(e, Client_NONE, Client_Group)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesClient()[index];
+}
+
+template<typename T> struct ClientTraits {
+  static const Client enum_value = Client_NONE;
+};
+
+template<> struct ClientTraits<PersonGroup::Person> {
+  static const Client enum_value = Client_Person;
+};
+
+template<> struct ClientTraits<PersonGroup::Group> {
+  static const Client enum_value = Client_Group;
+};
+
+bool VerifyClient(::flatbuffers::Verifier &verifier, const void *obj, Client type);
+bool VerifyClientVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
 struct Person FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef PersonBuilder Builder;
@@ -234,90 +279,50 @@ inline ::flatbuffers::Offset<Group> CreateGroupDirect(
       names__);
 }
 
-struct Client FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ClientBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_CLIENT_TYPE = 4,
-    VT_CLIENT = 6,
-    VT_GROUP = 8
-  };
-  int8_t client_type() const {
-    return GetField<int8_t>(VT_CLIENT_TYPE, 0);
-  }
-  const PersonGroup::Person *client() const {
-    return GetPointer<const PersonGroup::Person *>(VT_CLIENT);
-  }
-  const PersonGroup::Group *group() const {
-    return GetPointer<const PersonGroup::Group *>(VT_GROUP);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, VT_CLIENT_TYPE, 1) &&
-           VerifyOffset(verifier, VT_CLIENT) &&
-           verifier.VerifyTable(client()) &&
-           VerifyOffset(verifier, VT_GROUP) &&
-           verifier.VerifyTable(group()) &&
-           verifier.EndTable();
-  }
-};
-
-struct ClientBuilder {
-  typedef Client Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_client_type(int8_t client_type) {
-    fbb_.AddElement<int8_t>(Client::VT_CLIENT_TYPE, client_type, 0);
-  }
-  void add_client(::flatbuffers::Offset<PersonGroup::Person> client) {
-    fbb_.AddOffset(Client::VT_CLIENT, client);
-  }
-  void add_group(::flatbuffers::Offset<PersonGroup::Group> group) {
-    fbb_.AddOffset(Client::VT_GROUP, group);
-  }
-  explicit ClientBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Client> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Client>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Client> CreateClient(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    int8_t client_type = 0,
-    ::flatbuffers::Offset<PersonGroup::Person> client = 0,
-    ::flatbuffers::Offset<PersonGroup::Group> group = 0) {
-  ClientBuilder builder_(_fbb);
-  builder_.add_group(group);
-  builder_.add_client(client);
-  builder_.add_client_type(client_type);
-  return builder_.Finish();
-}
-
 struct Root FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef RootBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_CLIENT = 4
+    VT_CLIENT_TYPE = 4,
+    VT_CLIENT = 6
   };
-  const PersonGroup::Client *client() const {
-    return GetPointer<const PersonGroup::Client *>(VT_CLIENT);
+  PersonGroup::Client client_type() const {
+    return static_cast<PersonGroup::Client>(GetField<uint8_t>(VT_CLIENT_TYPE, 0));
+  }
+  const void *client() const {
+    return GetPointer<const void *>(VT_CLIENT);
+  }
+  template<typename T> const T *client_as() const;
+  const PersonGroup::Person *client_as_Person() const {
+    return client_type() == PersonGroup::Client_Person ? static_cast<const PersonGroup::Person *>(client()) : nullptr;
+  }
+  const PersonGroup::Group *client_as_Group() const {
+    return client_type() == PersonGroup::Client_Group ? static_cast<const PersonGroup::Group *>(client()) : nullptr;
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_CLIENT_TYPE, 1) &&
            VerifyOffset(verifier, VT_CLIENT) &&
-           verifier.VerifyTable(client()) &&
+           VerifyClient(verifier, client(), client_type()) &&
            verifier.EndTable();
   }
 };
+
+template<> inline const PersonGroup::Person *Root::client_as<PersonGroup::Person>() const {
+  return client_as_Person();
+}
+
+template<> inline const PersonGroup::Group *Root::client_as<PersonGroup::Group>() const {
+  return client_as_Group();
+}
 
 struct RootBuilder {
   typedef Root Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_client(::flatbuffers::Offset<PersonGroup::Client> client) {
+  void add_client_type(PersonGroup::Client client_type) {
+    fbb_.AddElement<uint8_t>(Root::VT_CLIENT_TYPE, static_cast<uint8_t>(client_type), 0);
+  }
+  void add_client(::flatbuffers::Offset<void> client) {
     fbb_.AddOffset(Root::VT_CLIENT, client);
   }
   explicit RootBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
@@ -333,10 +338,41 @@ struct RootBuilder {
 
 inline ::flatbuffers::Offset<Root> CreateRoot(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<PersonGroup::Client> client = 0) {
+    PersonGroup::Client client_type = PersonGroup::Client_NONE,
+    ::flatbuffers::Offset<void> client = 0) {
   RootBuilder builder_(_fbb);
   builder_.add_client(client);
+  builder_.add_client_type(client_type);
   return builder_.Finish();
+}
+
+inline bool VerifyClient(::flatbuffers::Verifier &verifier, const void *obj, Client type) {
+  switch (type) {
+    case Client_NONE: {
+      return true;
+    }
+    case Client_Person: {
+      auto ptr = reinterpret_cast<const PersonGroup::Person *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Client_Group: {
+      auto ptr = reinterpret_cast<const PersonGroup::Group *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyClientVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyClient(
+        verifier,  values->Get(i), types->GetEnum<Client>(i))) {
+      return false;
+    }
+  }
+  return true;
 }
 
 inline const PersonGroup::Root *GetRoot(const void *buf) {
