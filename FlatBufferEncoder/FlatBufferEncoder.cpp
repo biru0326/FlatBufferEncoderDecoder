@@ -1,9 +1,7 @@
 // FlatBufferEncoder.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 #pragma
-#include <iostream>
 #include <fstream>
-#include <vector>
 #include "flatbuffers/flatbuffers.h"
 #include "person_group_generated.h"
 #include <filesystem>
